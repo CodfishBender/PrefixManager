@@ -17,6 +17,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class CommandPrefix implements CommandExecutor {
@@ -43,7 +44,7 @@ public class CommandPrefix implements CommandExecutor {
         StaticPane pane = new StaticPane(0, 0, 9, 6);
 
         // If no player data, show nothing
-        if (prefixes == null || prefixes.size() == 0) {
+        if (prefixes.isEmpty()) {
             gui.show(player);
             return true;
         }
