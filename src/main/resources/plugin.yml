@@ -1,0 +1,20 @@
+name: PrefixManager
+version: '${project.version}'
+main: com.prefixmanager.PrefixManager
+api-version: '1.20'
+author: CodfishBender
+load: POSTWORLD
+
+commands:
+  prefix:
+    description: Shows the prefix GUI
+  prefixmanager:
+    description: Admin command
+    aliases: [pfm]
+
+
+permissions:
+  prefixmanager.prefix:
+    description: Access to the prefix GUI
+  prefixmanager.admin:
+    description: Admin commands
