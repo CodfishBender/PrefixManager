@@ -25,8 +25,8 @@ public class CommandPrefixManager implements CommandExecutor {
         if (args[0].equals("add")) {
             if (args.length > 2) {
                 UUID p = Bukkit.getOfflinePlayer(args[1]).getUniqueId();
-                String prefix = PrefixManager.storage.addPrefixToUser(p, args[2]);
-                PrefixManager.sendMessage(sender, prefix + "&f has been added to &e" + args[1] + "&f's prefixes.");
+                PrefixManager.storage.addPrefixToUser(p, args[2]);
+                PrefixManager.sendMessage(sender, args[2] + "&f has been added to &e" + args[1] + "&f's prefixes.");
                 return true;
             } else {
                 PrefixManager.sendMessage(sender, "&cNot enough arguments");
@@ -36,8 +36,8 @@ public class CommandPrefixManager implements CommandExecutor {
         else if (args[0].equals("list") || args[0].equals("get")) {
             if (args.length > 1) {
                 UUID uuid = Bukkit.getOfflinePlayer(args[1]).getUniqueId();
-                List<String> prefixes = PrefixManager.storage.loadUserPrefixes(uuid);
-                if (prefixes == null || prefixes.size() == 0) {
+                List<String> prefixes = (List<String>) PrefixManager.storage.loadUserPrefixes(uuid);
+                if (prefixes == null || prefixes.isEmpty()) {
                     PrefixManager.sendMessage(sender, "&e" + args[1] + "&7 has no stored prefixes.");
                     return true;
                 }
