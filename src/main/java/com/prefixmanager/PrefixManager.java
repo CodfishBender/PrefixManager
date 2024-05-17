@@ -26,27 +26,25 @@ public final class PrefixManager extends JavaPlugin {
         // Check if LuckPerms exists on the server, if not, shut down PrefixManager
         checkLuckPermsExist();
 
+        // Set static variables
         luckPerms = getServer().getServicesManager().load(LuckPerms.class);
-
         instance = this;
         storage = new StorageHandler();
 
+        // Create classes
         getCommand("prefix").setExecutor(new CommandPrefix());
         getCommand("prefixmanager").setExecutor(new CommandPrefixManager());
         getCommand("prefixmanager").setTabCompleter(new PrefixManagerTabCompleter());
     }
 
     public static void log(String s) {
-        instance.getLogger().log(Level.INFO,s);
+        log(Level.INFO, s);
     }
     public static void log(Level l, String s) {
         instance.getLogger().log(l,s);
     }
     public static void sendMessage(CommandSender sender, String msg) {
-        if (sender instanceof ConsoleCommandSender)
-            log(msg);
-        else if (sender instanceof Player)
-            sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(PREFIX + msg));
+        sendMessage(sender, msg, true);
     }
     public static void sendMessage(CommandSender sender, String msg, boolean prefix) {
         if (sender instanceof ConsoleCommandSender)
@@ -55,7 +53,9 @@ public final class PrefixManager extends JavaPlugin {
             sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize((prefix) ? PREFIX + msg : msg));
     }
 
-    // Check if LuckPerms exists on the server and enabled, if not, disable the plugin
+    /**
+     *  Check if LuckPerms exists on the server and enabled, if not, disable the plugin.
+     */
     private void checkLuckPermsExist() {
         // Check if LuckPerms exists on the server and enabled
         if (!Bukkit.getServer().getPluginManager().getPlugin("LuckPerms").isEnabled()) {

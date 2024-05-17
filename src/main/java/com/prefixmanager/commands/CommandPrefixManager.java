@@ -24,20 +24,36 @@ public class CommandPrefixManager implements CommandExecutor {
         // prefixmanager add <player> <prefix>
         if (args[0].equals("add")) {
             if (args.length > 2) {
+                // Get player UUID
                 UUID p = Bukkit.getOfflinePlayer(args[1]).getUniqueId();
-                PrefixManager.storage.addPrefixToUser(p, args[2]);
-                PrefixManager.sendMessage(sender, args[2] + "&f has been added to &e" + args[1] + "&f's prefixes.");
+
+                // Add the prefix - send message if unsuccessful
+                if (PrefixManager.storage.addPrefixToUser(p, args[2])) {
+                    PrefixManager.sendMessage(sender, args[2] + "&f has been added to &e" + args[1] + "&f's prefixes.");
+                } else {
+                    PrefixManager.sendMessage(sender, "Failed to add " + args[2] + "&f to &e" + args[1] + "&f's prefixes. See console for details.");
+                }
                 return true;
             } else {
                 PrefixManager.sendMessage(sender, "&cNot enough arguments");
                 return false;
             }
         }
+        // List all prefixes from a user, indexed by list order
         else if (args[0].equals("list") || args[0].equals("get")) {
             if (args.length > 1) {
+
+                // Get player
                 UUID uuid = Bukkit.getOfflinePlayer(args[1]).getUniqueId();
-                List<String> prefixes = (List<String>) PrefixManager.storage.loadUserPrefixes(uuid);
-                if (prefixes == null || prefixes.isEmpty()) {
+                // Get prefixes
+                List<String> prefixes = PrefixManager.storage.loadUserPrefixes(uuid);
+
+                if (prefixes == null) {
+                    PrefixManager.sendMessage(sender, "&e" + args[1] + "&7 failed to load prefixes.");
+                    return true;
+                }
+
+                if (prefixes.isEmpty()) {
                     PrefixManager.sendMessage(sender, "&e" + args[1] + "&7 has no stored prefixes.");
                     return true;
                 }

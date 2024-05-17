@@ -1,43 +1,31 @@
 package com.prefixmanager;
 
-import net.luckperms.api.context.ContextSetFactory;
 import net.luckperms.api.model.user.User;
-import net.luckperms.api.node.Node;
 import net.luckperms.api.node.NodeType;
 import net.luckperms.api.node.types.PrefixNode;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Player;
 
 import java.util.*;
 import java.util.logging.Level;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class StorageHandler {
 
     /**
-     * Changes the desired prefix to a weight of 100 and sets all other prefixes to 0
-     * @param player The player the prefixes will be changed upon
-     * @param prefix The prefix to be changed to the weight of 100
+     * Effectively displays a stored prefix by duplicating it to priority 100 and removing any other prefix at priority 100.
+     * @param uuid The UUID of the user to change the prefix.
+     * @param prefix The prefix to be displayed.
      */
-    public void updatePlayerPrefix(HumanEntity player, String prefix) {
-        if (!(player instanceof Player)) return;
+    public void updateDisplayedPrefix(UUID uuid, String prefix) {
 
         // Write to luckperms user database
-        PrefixManager.luckPerms.getUserManager().modifyUser(player.getUniqueId(), user -> {
+        PrefixManager.luckPerms.getUserManager().modifyUser(uuid, user -> {
+
             // Iterate over existing prefix nodes
             for (PrefixNode node : user.getNodes(NodeType.PREFIX)) {
-                // If it's a prefix node, set its weight to 0
-                if (node == null) return;
-
-                // Remove the node
-                user.data().remove(node);
-
-                // Check if the node is the prefix clicked on. If not add it with a weight of 0;
-                if (!node.getMetaValue().equalsIgnoreCase(prefix)) {
-                   user.data().add(PrefixNode.builder(node.getMetaValue(), 0).build());
-                }
+                // Skip invalid nodes
+                if (node == null) continue;
+                // Remove node if priority is 100
+                if (node.getPriority() == 100) user.data().remove(node);
             }
             // Add the new prefix with weight 100
             user.data().add(PrefixNode.builder(prefix, 100).build());
@@ -45,47 +33,77 @@ public class StorageHandler {
 
         // Send messages
         String m = "New prefix: " + prefix;
-        player.sendMessage(m);
+        PrefixManager.sendMessage(Bukkit.getPlayer(uuid), m);
         PrefixManager.log(m);
     }
 
     /**
      * Get a list of all prefix nodes as strings, belonging to a user.
-     * @param uuid The UUID of the user.
+     * @param user The Luckperms User.
      * @return A list of all user prefix nodes.
      */
-    public List<String> loadUserPrefixes(UUID uuid) {
-        // Where the prefixes will be stored by name
-        List<String> prefixList = new ArrayList<>();
-
-        User user = PrefixManager.luckPerms.getUserManager().getUser(uuid);
+    public List<String> loadUserPrefixes(User user) {
         if (user == null) return null;
 
-        // Check each node by filter of prefix and add the metavalue (prefix) to the list
+        // The list to hold prefix strings
+        List<String> prefixList = new ArrayList<>();
+
+        // Get all PREFIX node values
         for (PrefixNode node : user.getNodes(NodeType.PREFIX)) {
             prefixList.add(node.getMetaValue());
         }
+        // Make sure list order is consistent
+        Collections.sort(prefixList);
         return prefixList;
     }
-    SortedMap<Integer, String> loadUserPrefixes(User user) {
+    /**
+     * @param uuid The UUID of the user.
+     */
+    public List<String> loadUserPrefixes(UUID uuid) {
+        return loadUserPrefixes(PrefixManager.luckPerms.getUserManager().getUser(uuid));
+    }
+
+    /**
+     * Get a list of all cached prefix nodes as a sorted map, defined as [ Priority, Prefix ].
+     * @param user The luckperms user to lookup.
+     * @return Returns a sorted map of prefixes. Returns null if user is null.
+     */
+    public SortedMap<Integer, String> loadCachedPrefixes(User user) {
         if (user == null) return null;
         return user.getCachedData().getMetaData().getPrefixes();
+    }
+    /**
+     * @param uuid The UUID of the user.
+     */
+    public SortedMap<Integer, String> loadCachedPrefixes(UUID uuid) {
+        return loadCachedPrefixes(PrefixManager.luckPerms.getUserManager().getUser(uuid));
     }
 
     /**
      * Insert a new prefix into the metadata of the user.
      * @param uuid The UUID of the user.
      * @param newPrefix The prefix to add.
-     * @return The prefix that was added. Simply returns newPrefix arg if successful. Returns null if unsuccessful.
+     * @return Returns true if successful. Returns false if unsuccessful.
      */
-    public void addPrefixToUser(UUID uuid, String newPrefix) {
-        PrefixManager.luckPerms.getUserManager().modifyUser(uuid, user -> {
-            user.data().add(PrefixNode.builder(newPrefix, 0).build());
-        });
+    public boolean addPrefixToUser(UUID uuid, String newPrefix) {
+        try {
+            PrefixManager.luckPerms.getUserManager().modifyUser(uuid, user -> user.data().add(PrefixNode.builder(newPrefix, 0).build()));
+            return true;
+        } catch(Exception e) {
+            PrefixManager.log(Level.SEVERE, e.toString());
+            return false;
+        }
     }
 
-    // You can do this - :)
-    public String removePrefixFromUser(UUID uuid, int index) {
+    /**
+     * Remove an existing prefix from the metadata of the user.
+     * @param uuid The UUID of the user.
+     * @param oldPrefix The prefix to remove.
+     * @return The prefix that was added. Simply returns newPrefix arg if successful. Returns null if unsuccessful.
+     */
+    public String removePrefixFromUser(UUID uuid, int oldPrefix) {
+        /* TODO: Remove prefix from meta data */
+        String prefixes = loadUserPrefixes(uuid).get(oldPrefix);
         User user = PrefixManager.luckPerms.getUserManager().getUser(uuid);
         if (user == null) return null;
         return null;

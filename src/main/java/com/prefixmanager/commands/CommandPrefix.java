@@ -17,7 +17,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class CommandPrefix implements CommandExecutor {
@@ -70,7 +69,7 @@ public class CommandPrefix implements CommandExecutor {
             GuiItem guiItem = new GuiItem(itemStack, event -> {
                 event.setCancelled(true);
                 // Apply the prefix to the player
-                PrefixManager.storage.updatePlayerPrefix(event.getWhoClicked(), prefix);
+                PrefixManager.storage.updateDisplayedPrefix(event.getWhoClicked().getUniqueId(), prefix);
             });
             // Add gui item to pane
             pane.addItem(guiItem, Slot.fromIndex(i));
