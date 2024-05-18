@@ -102,8 +102,12 @@ public class CommandPrefix implements CommandExecutor {
             // Prefix to use
             String prefix = prefixes.get(i);
 
+            // Add description from config
+            String desc = PrefixManager.config.prefixDescMap.get(prefix);
+            desc = (desc == null) ? "" : desc + "\n\n";
+
             // Create item stack
-            ItemStack itemStack = createGuiItemStack(Material.NAME_TAG, prefix, "Click to apply this prefix!\n\n&fCurrent:\n" + user.getCachedData().getMetaData().getPrefix() + player.getName());
+            ItemStack itemStack = createGuiItemStack(Material.NAME_TAG, prefix, desc + "Click to apply this prefix!\n\n&fCurrent:\n" + user.getCachedData().getMetaData().getPrefix() + player.getName());
 
             // Create GUI item
             GuiItem guiItem = new GuiItem(itemStack, e -> {

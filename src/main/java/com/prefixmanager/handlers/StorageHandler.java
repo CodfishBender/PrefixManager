@@ -67,22 +67,6 @@ public class StorageHandler {
     }
 
     /**
-     * Get a list of all cached prefix nodes as a sorted map, defined as [ Priority, Prefix ].
-     * @param user The luckperms user to lookup.
-     * @return Returns a sorted map of prefixes. Returns null if user is null.
-     */
-    public SortedMap<Integer, String> loadCachedPrefixes(User user) {
-        if (user == null) return null;
-        return user.getCachedData().getMetaData().getPrefixes();
-    }
-    /**
-     * @param uuid The UUID of the user.
-     */
-    public SortedMap<Integer, String> loadCachedPrefixes(UUID uuid) {
-        return loadCachedPrefixes(PrefixManager.luckPerms.getUserManager().getUser(uuid));
-    }
-
-    /**
      * Insert a new prefix into the metadata of the user.
      * @param uuid The UUID of the user.
      * @param newPrefix The prefix to add.

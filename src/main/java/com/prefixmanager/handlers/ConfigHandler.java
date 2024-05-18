@@ -3,12 +3,13 @@ package com.prefixmanager.handlers;
 import com.prefixmanager.PrefixManager;
 import org.bukkit.configuration.ConfigurationSection;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.logging.Level;
 
 public class ConfigHandler {
 
-    public static Hashtable<String,String> configPrefixes = new Hashtable<>();
+    public HashMap<String,String> prefixKeyMap = new HashMap<>();
+    public HashMap<String,String> prefixDescMap = new HashMap<>();
 
     /**
      * Load the current config into the hashtable configPrefixes.
@@ -27,8 +28,8 @@ public class ConfigHandler {
             for (String key:configSection.getKeys(false)) {
                 String prefix = configSection.getString(key + ".prefix");
                 String desc = configSection.getString(key + ".desc");
-
-                configPrefixes.put(prefix, desc);
+                prefixKeyMap.put(key, prefix);
+                prefixDescMap.put(prefix, desc);
             }
         } catch (Exception e) {
             PrefixManager.log(Level.SEVERE, e.toString());
