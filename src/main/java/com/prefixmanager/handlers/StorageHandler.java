@@ -1,5 +1,6 @@
-package com.prefixmanager;
+package com.prefixmanager.handlers;
 
+import com.prefixmanager.PrefixManager;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.NodeType;
 import net.luckperms.api.node.types.PrefixNode;

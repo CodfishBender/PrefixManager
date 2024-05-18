@@ -17,7 +17,7 @@ import java.util.UUID;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.format.NamedTextColor.GRAY;
 
-public class CommandPrefixManager implements CommandExecutor {
+public class CommandPrefixAdmin implements CommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {

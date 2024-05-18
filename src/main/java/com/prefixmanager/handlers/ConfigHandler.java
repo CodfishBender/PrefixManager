@@ -1,11 +1,12 @@
-package com.prefixmanager;
+package com.prefixmanager.handlers;
 
+import com.prefixmanager.PrefixManager;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.Hashtable;
 import java.util.logging.Level;
 
-public class PrefixConfig {
+public class ConfigHandler {
 
     public static Hashtable<String,String> configPrefixes = new Hashtable<>();
 

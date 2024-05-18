@@ -71,6 +71,11 @@ public class CommandPrefix implements CommandExecutor {
         return true;
     }
 
+    /**
+     * Load the GUI to the player with the prefixes from the luckperms user.
+     * @param player The bukkit player.
+     * @param user The luckperms user.
+     */
     private void customPrefixGui(Player player, User user) {
         // Get prefixes
         List<String> prefixes = PrefixManager.storage.loadUserPrefixes(user, 0);

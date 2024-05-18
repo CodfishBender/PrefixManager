@@ -1,7 +1,9 @@
 package com.prefixmanager;
 
 import com.prefixmanager.commands.CommandPrefix;
-import com.prefixmanager.commands.CommandPrefixManager;
+import com.prefixmanager.commands.CommandPrefixAdmin;
+import com.prefixmanager.handlers.ConfigHandler;
+import com.prefixmanager.handlers.StorageHandler;
 import com.prefixmanager.tabcompleter.PrefixManagerTabCompleter;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.luckperms.api.LuckPerms;
@@ -17,7 +19,7 @@ public final class PrefixManager extends JavaPlugin {
     public static StorageHandler storage;
     public static LuckPerms luckPerms;
     public static final String PREFIX = "&8[&ePrefixManager&8] &r";
-    public static PrefixConfig config;
+    public static ConfigHandler config;
 
     @Override
     public void onEnable() {
@@ -32,12 +34,12 @@ public final class PrefixManager extends JavaPlugin {
 
         // Create config
         this.saveDefaultConfig();
-        config = new PrefixConfig();
+        config = new ConfigHandler();
         config.loadConfig();
 
         // Create classes
         getCommand("prefix").setExecutor(new CommandPrefix());
-        getCommand("prefixmanager").setExecutor(new CommandPrefixManager());
+        getCommand("prefixmanager").setExecutor(new CommandPrefixAdmin());
         getCommand("prefixmanager").setTabCompleter(new PrefixManagerTabCompleter());
     }
 
