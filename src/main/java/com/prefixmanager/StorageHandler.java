@@ -32,17 +32,16 @@ public class StorageHandler {
         });
 
         // Send messages
-        String m = "New prefix: " + prefix;
-        PrefixManager.sendMessage(Bukkit.getPlayer(uuid), m);
-        PrefixManager.log(m);
+        PrefixManager.sendMessage(Bukkit.getPlayer(uuid), "Prefix updated: " + prefix, false);
     }
 
     /**
      * Get a list of all prefix nodes as strings, belonging to a user.
      * @param user The Luckperms User.
+     * @param priority The weight of the node. null for all priority.
      * @return A list of all user prefix nodes.
      */
-    public List<String> loadUserPrefixes(User user) {
+    public List<String> loadUserPrefixes(User user, Integer priority) {
         if (user == null) return null;
 
         // The list to hold prefix strings
@@ -50,6 +49,9 @@ public class StorageHandler {
 
         // Get all PREFIX node values
         for (PrefixNode node : user.getNodes(NodeType.PREFIX)) {
+            // Filter by priority
+            if (priority != null && node.getPriority() != priority) continue;
+            // Add prefix to the list
             prefixList.add(node.getMetaValue());
         }
         // Make sure list order is consistent
@@ -59,8 +61,8 @@ public class StorageHandler {
     /**
      * @param uuid The UUID of the user.
      */
-    public List<String> loadUserPrefixes(UUID uuid) {
-        return loadUserPrefixes(PrefixManager.luckPerms.getUserManager().getUser(uuid));
+    public List<String> loadUserPrefixes(UUID uuid, int priority) {
+        return loadUserPrefixes(PrefixManager.luckPerms.getUserManager().getUser(uuid), priority);
     }
 
     /**
@@ -87,9 +89,11 @@ public class StorageHandler {
      */
     public boolean addPrefixToUser(UUID uuid, String newPrefix) {
         try {
+            // Add the prefix to priority 0
             PrefixManager.luckPerms.getUserManager().modifyUser(uuid, user -> user.data().add(PrefixNode.builder(newPrefix, 0).build()));
             return true;
         } catch(Exception e) {
+            // Log exception and return false
             PrefixManager.log(Level.SEVERE, e.toString());
             return false;
         }
@@ -101,11 +105,39 @@ public class StorageHandler {
      * @param oldPrefix The prefix to remove.
      * @return The prefix that was added. Simply returns newPrefix arg if successful. Returns null if unsuccessful.
      */
-    public String removePrefixFromUser(UUID uuid, int oldPrefix) {
-        /* TODO: Remove prefix from meta data */
-        String prefixes = loadUserPrefixes(uuid).get(oldPrefix);
-        User user = PrefixManager.luckPerms.getUserManager().getUser(uuid);
-        if (user == null) return null;
-        return null;
+    public boolean removePrefixFromUser(UUID uuid, String oldPrefix) {
+        try {
+            PrefixManager.luckPerms.getUserManager().modifyUser(uuid, user -> {
+                PrefixNode node = user.getNodes(NodeType.PREFIX).stream().filter(e -> Objects.equals(e.getMetaValue(), oldPrefix)).findFirst().orElse(null);
+                if (node == null) {
+                    PrefixManager.log(Level.SEVERE, "Failed to remove prefix. User " + uuid + " does not have prefix: " + oldPrefix);
+                    throw new NullPointerException();
+                }
+                user.data().remove(node);
+            });
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Makes sure if the user has a 100 priority prefix, it also exists at 0 priority.
+     *
+     * @param user The Luckperms user to check.
+     * @return true if prefix was updated.
+     */
+    public boolean integrityCheck(User user) {
+        // Get applied prefix
+        String prefix = user.getCachedData().getMetaData().getPrefixes().get(100);
+        // Skip if no applied prefix
+        if (prefix.isEmpty()) return false;
+        // Skip if prefix exists at priority 0
+        if (user.getNodes(NodeType.PREFIX).stream().anyMatch(e -> e.getPriority() == 0 && Objects.equals(e.getMetaValue(), prefix))) return false;
+
+        // Add the prefix to priority 0
+        PrefixManager.luckPerms.getUserManager().modifyUser(user.getUniqueId(), u -> u.data().add(PrefixNode.builder(prefix, 0).build()));
+        PrefixManager.log("Added existing prefix " + prefix + " to " + user.getUsername());
+        return true;
     }
 }

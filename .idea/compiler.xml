@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="PrefixManager" target="9" />
+      <module name="PrefixManager" target="17" />
     </bytecodeTargetLevel>
   </component>
 </project>

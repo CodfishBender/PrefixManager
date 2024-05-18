@@ -10,7 +10,7 @@ commands:
     description: Shows the prefix GUI
   prefixmanager:
     description: Admin command
-    aliases: [pfm]
+    aliases: [pmr]
 
 
 permissions:

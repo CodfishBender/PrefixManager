@@ -1,6 +1,6 @@
 package com.prefixmanager.tabcompleter;
 
-import org.bukkit.Bukkit;
+import com.prefixmanager.PrefixManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -11,13 +11,17 @@ import java.util.Arrays;
 import java.util.List;
 
 public class PrefixManagerTabCompleter implements TabCompleter {
-    private List<String> subcommands = new ArrayList<>(Arrays.asList("gm","changeworld","reload"));
+    private final List<String> subcommands = new ArrayList<>(Arrays.asList("add","list","remove","reload"));
 
+    /**
+     * Get a list of players filtered based on the argument provided.
+     * @param args The argument to check against (takes the final string in the array).
+     * @return String List of players that match the args.
+     */
     List<String> getPlayerList(String[] args) {
         List<String> names = new ArrayList<>();
 
-        Player[] players = new Player[Bukkit.getServer().getOnlinePlayers().size()];
-        for (Player player : Bukkit.getServer().getOnlinePlayers().toArray(players)) {
+        for (Player player : PrefixManager.instance.getServer().getOnlinePlayers()) {
             if (player.getName().toLowerCase().contains(args[args.length - 1])) {
                 names.add(player.getName());
             }
@@ -30,14 +34,9 @@ public class PrefixManagerTabCompleter implements TabCompleter {
         List<String> ret = new ArrayList<>();
         switch (args.length) {
             case 1:
-                ret.add("add");
-                ret.add("list");
-                ret.add("get");
-                ret.add("remove");
-                return ret;
+                ret.addAll(subcommands);
             case 2:
                 ret.addAll(getPlayerList(args));
-                return ret;
         }
         return ret;
     }
