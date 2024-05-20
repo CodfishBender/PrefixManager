@@ -11,7 +11,7 @@ import java.util.*;
 public class PrefixManagerTabCompleter implements TabCompleter {
 
     List<String> complete = new ArrayList<>(); // Recycle frequently used variable
-    private final List<String> subcommands = new ArrayList<>(Arrays.asList("add","addpreset","list","remove","reload"));
+    private final List<String> adminCommands = new ArrayList<>(Arrays.asList("add","addpreset","list","remove","reload"));
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
@@ -21,7 +21,7 @@ public class PrefixManagerTabCompleter implements TabCompleter {
 
         switch (args.length) {
             case 1:
-                complete.addAll(subcommands);
+                complete.addAll(adminCommands);
                 break;
             case 2:
                 complete.addAll(getPlayerList(args));

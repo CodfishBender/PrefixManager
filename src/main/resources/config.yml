@@ -1,0 +1,4 @@
+prefixes:
+  ExamplePrefix:
+    prefix: "&7[&3Example Prefix&7]"
+    desc: "&fThis is an example prefix for testing."

@@ -4,7 +4,6 @@ import com.prefixmanager.PrefixManager;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.NodeType;
 import net.luckperms.api.node.types.PrefixNode;
-import org.bukkit.Bukkit;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -31,9 +30,6 @@ public class StorageHandler {
             // Add the new prefix with weight 100
             user.data().add(PrefixNode.builder(prefix, 100).build());
         });
-
-        // Send messages
-        PrefixManager.sendMessage(Bukkit.getPlayer(uuid), "Prefix updated: " + prefix, false);
     }
 
     /**
@@ -114,11 +110,12 @@ public class StorageHandler {
      */
     public boolean integrityCheck(User user) {
         // Get applied prefix
-        String prefix = user.getCachedData().getMetaData().getPrefixes().get(100);
+        PrefixNode prefixNode = user.getNodes(NodeType.PREFIX).stream().filter(n -> n.getPriority() == 100).findFirst().orElse(null);
         // Skip if no applied prefix
-        if (prefix.isEmpty()) return false;
+        if (prefixNode == null) return false;
+        String prefix = prefixNode.getMetaValue();
         // Skip if prefix exists at priority 0
-        if (user.getNodes(NodeType.PREFIX).stream().anyMatch(e -> e.getPriority() == 0 && Objects.equals(e.getMetaValue(), prefix))) return false;
+        if (user.getNodes(NodeType.PREFIX).stream().anyMatch(e -> e.getPriority() == 0 && e.getMetaValue().equals(prefix))) return false;
 
         // Add the prefix to priority 0
         PrefixManager.luckPerms.getUserManager().modifyUser(user.getUniqueId(), u -> u.data().add(PrefixNode.builder(prefix, 0).build()));
